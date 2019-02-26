@@ -225,4 +225,4 @@ function getRandomInt(min, max) {
 // start the server
 //app.listen(port, host);
 app.listen(process.env.PORT || 3000);
-console.log('Server started! At port ' + port);
+//console.log('Server started! At port ' + port);
