@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
-var port = 3000;
-var host = '0.0.0.0';
+//var port = 3000;
+//var host = '0.0.0.0';
 var spotifyToken = 'BQB7W_8hZRaaDBUEdkLKkqihvSod_rnRA2Ac_06oNwp-WhNidmNykUjVRIv0zbAPkrSnDLD7xABI5Yj5lxIKXmPUjngfGWv4WCJfefTY05R750fjKdjgBYvk6JwSahPyzQz0i3EKS-FPi2yHEtvdYw3S4fuzo7cdi9W6-MiINbRA70x3ALQe_uWHs1tfGKCcKsciuCikBuCONpxMrp54R1cIGNUEbLhVeLkA4CWkWOQjAEqSdUXZi6YDff5wpuKKLUMQhXUmR0MYzqw'
 
 var bodyParser = require('body-parser');
@@ -223,5 +223,6 @@ function getRandomInt(min, max) {
 
 
 // start the server
-app.listen(port, host);
+//app.listen(port, host);
+app.listen(process.env.PORT || 3000);
 console.log('Server started! At port ' + port);
