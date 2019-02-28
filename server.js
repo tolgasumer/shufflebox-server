@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 //var port = 3000;
 //var host = '0.0.0.0';
-var spotifyToken = 'AQBAIhqEwWXpjJqVGMqkdX59yN18ld1RsrisxSZhCX6YUVQwqXc9pm3HJLr6e7f31uxpPemPTjKHQkgYVv6R4dmnMVUvi-TPujrgJ5BO2odlp85BcRgqm5CNlNv1Z-Q8eqfu1vxuDbFv-AP2eHEyBHqs3XceFAa-UOH2vn8VH39LGbWDSXMbWOEhnGXyPstNbnlzOJwtCrABG3Hffk3QtxVrfqcJfNu8FH1PXje8DwYEaaxMKSlPvqzLBNKS5asUKY3c_oupAgtRakDLBqhzJ7YJdDvqULSNWbudmYSnLUWjRn9MnqAsuQtcAMPfhZ5BPsMlwSnm26bRQCm4-hkuEg'
+var spotifyToken = 'BQBfoFFUAHCVSqB6SGGG6RXFZ0m_6TzWqTdZrD7PqABJnesgNUGkCG62qUwFJgFqvWgiqituP9JuKvNE9FwBFQbR2aSNPLuigNlbLXWQOHQK0C_FgMPDVPHNgOnZgoCsyk7O_8P3mAXatkQOllZVWT1IyQQvP0f734gmkNJSlqoZHaL3JzowcpnYvmUSRkA58fc2dATEBx6GWU6Z0mTvflLeiOVJRwzge-GUTnkA6ree3Vf8zXEAJIFxivKu4RWoOSJreuJmU7zIRp0'
 
 var bodyParser = require('body-parser');
 const axios = require('axios')
