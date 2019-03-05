@@ -1,8 +1,11 @@
 var express = require('express');
 var app = express();
+var request = require('request');
 //var port = 3000;
 //var host = '0.0.0.0';
-var spotifyToken = 'BQB20vy9sAQQG2y_eaSGHfmO5NPDTA2HnmtByn6Dn3clUhZYS3IF8NutaSD0x_K5nffofy0ympuv1aq8EjD4BkscIbRYQnLxmNGPFg-bj2BzRjiYWxM1F1TqkIhjftANf74s4DqlmOSStT08tF4_NJqo7VwmZRgwYuoJ7z-E4v3s8IAQw2ljMiifQTMPkbIDX4GMQVug4dTyDxW2DQARWv049DZwSB_hTjgTcA5wbND5dSHfDmsbLfQ'
+var spotifyToken = ''
+var client_id = 'bddfdc9233b5493899809dcc42ca5cc3'; // Your client id
+var client_secret = 'd97a1e581b5f4b4b9da348d6a0529e02'; // Your secret
 
 var bodyParser = require('body-parser');
 const axios = require('axios')
@@ -47,6 +50,28 @@ app.get('/getvotables', function (req, res) {
   res.json(votableSongIndexes);
 });
 
+function GetSpotifyAccessToken()
+{
+    // requesting access token from refresh token
+  var refresh_token = 'AQCMPbhoRmyMwnIFIMOKYJ8gsRgxsy3krRSE37-x7UYWtvWEJagm6f6Ahs4yBBPclhqjdBG2Mpr4vNqu2eITElOROWU2Mje3zX8OSMeVyX3BQf0q0n28OeH23XfJrpIwWWc8LQ';
+  var authOptions = {
+    url: 'https://accounts.spotify.com/api/token',
+    headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+    form: {
+      grant_type: 'refresh_token',
+      refresh_token: refresh_token
+    },
+    json: true
+  };
+
+  request.post(authOptions, function(error, response, body) {
+    if (!error && response.statusCode === 200) {
+      var access_token = body.access_token;
+      console.log(access_token);
+      spotifyToken = access_token;
+    }
+  });
+}
 
 
 //Spotify requests
@@ -76,6 +101,7 @@ spotify
 }
 
 // interval
+setTimeout(function(){GetSpotifyAccessToken()}, 1000);
 setTimeout(function(){GetPlaylist()}, 1000);
 setTimeout(function(){PlayWinner()}, 90000);
 setTimeout(function(){RefreshVotableSongs()}, 5000);
