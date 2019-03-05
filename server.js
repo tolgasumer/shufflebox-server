@@ -106,6 +106,7 @@ setTimeout(function(){GetPlaylist()}, 1000);
 setTimeout(function(){PlayWinner()}, 90000);
 setTimeout(function(){RefreshVotableSongs()}, 5000);
 
+setInterval(function () { GetSpotifyAccessToken(); }, 60000);
 setInterval(function () { DetermineMostVotedCurrently(); }, 1000);
 setInterval(function () { GetCurrentlyPlaying(); }, 3000);
 setInterval(function () { GetPlaylist(); }, 10000);
