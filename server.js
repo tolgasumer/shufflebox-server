@@ -26,6 +26,11 @@ app.post('/sendvote', function (req, res) {
   res.end();
 });
 
+// Loader.io test
+app.get('/loaderio-c74a0910b6c7711002911d1c57cf189f', function (req, res) {
+  res.send('loaderio-c74a0910b6c7711002911d1c57cf189f');
+});
+
 app.get('/getinfo', function (req, res) {
   //console.log("Incoming GET");
   res.json({
