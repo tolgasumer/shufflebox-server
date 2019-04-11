@@ -21,7 +21,10 @@ var mostVotedCurrently;
 app.post('/sendvote', function (req, res) {
   var song_id = req.body.songid;
   console.log("Incoming POST: Vote for song ID:" + song_id);
-  votes[song_id - 1]++;
+  if(song_id>0 && song_id<6)
+  {
+    votes[song_id - 1]++;
+  }
   console.log(votes);
   res.end();
 });
