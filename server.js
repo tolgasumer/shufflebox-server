@@ -78,6 +78,18 @@ app.post('/getsimilarity', function (req, res) {
     })
 });
 
+app.post('/getaudiofeatures', function (req, res) {
+  console.log("/getaudiofeatures request:")
+  console.log("playlistid", req.body.playlistid);
+
+  var playlist = new Playlist(req.body.playlistid, 'user');
+  playlist.playlistFeaturesMean
+    .then(function (playlistFeaturesMean) {
+      res.json(playlistFeaturesMean)
+      console.log("sending json:",playlistFeaturesMean);
+    })
+});
+
 function GetSpotifyAccessToken()
 {
     // requesting access token from refresh token
