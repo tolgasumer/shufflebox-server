@@ -81,7 +81,7 @@ app.post('/getsimilarity', function (req, res) {
 function GetSpotifyAccessToken()
 {
     // requesting access token from refresh token
-  var refresh_token = 'AQCMPbhoRmyMwnIFIMOKYJ8gsRgxsy3krRSE37-x7UYWtvWEJagm6f6Ahs4yBBPclhqjdBG2Mpr4vNqu2eITElOROWU2Mje3zX8OSMeVyX3BQf0q0n28OeH23XfJrpIwWWc8LQ';
+  var refresh_token = 'AQCbR9xoXdt1F-ERUqPrubHUAfvhdCFnLIKT5XZWEcLdpQhV3YvuI_nBB1wqIbJJAqQjrUuBT1HHKNBLT2KUxul6eCpvPb5mY6PhYW7mXH4KEEi80x1pH2kJXzcE9DdqGIvAHg';
   var authOptions = {
     url: 'https://accounts.spotify.com/api/token',
     headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
