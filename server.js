@@ -285,6 +285,26 @@ var spotifyApi = new SpotifyWebApi({
 });
 spotifyApi.setAccessToken(spotifyToken);
 
+//playlist object containing features
+function Playlist(playlistid, type) {
+  this.name = GetPlaylist(playlistid)
+    .then(function (playlist) {
+      return playlist.name;
+    });
+
+  this.playlistFeaturesMean = GetPlaylist(playlistid)
+    .then(function (playlist) {
+      return GetPlaylistFeatures(playlist.tracks.items);
+    })
+    .then(function (playlistFeatures) {
+      return CalculatePlaylistFeaturesMean(playlistFeatures);
+    });
+
+  if (type == 'host') {
+    AddToPlaylistCollection(this);
+  }
+}
+
 
 //get playlist call
 function GetPlaylist(playlistid) {
