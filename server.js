@@ -17,6 +17,7 @@ var votableSongIndexes = [0, 0, 0, 0, 0];
 var currentWinner;
 var durationOfNextSong;
 var mostVotedCurrently;
+var playlistCollection = []; //for playlist comparison-similarity check
 
 app.post('/sendvote', function (req, res) {
   var song_id = req.body.songid;
@@ -58,6 +59,25 @@ app.get('/getvotables', function (req, res) {
   res.json(votableSongIndexes);
 });
 
+app.post('/getsimilarity', function (req, res) {
+  console.log("/getsimilarity request:")
+  console.log("user_playlistid", req.body.user_playlistid);
+  console.log("target_playlistid", req.body.target_playlistid);
+
+  var targetPlaylist = new Playlist(req.body.target_playlistid, 'host');
+
+  var userPlaylist = new Playlist(req.body.user_playlistid, 'user');
+  userPlaylist.playlistFeaturesMean
+    .then(function () {
+      return CalculateSimilarityToPlaylist(userPlaylist, targetPlaylist)
+    })
+    .then(function (similarityPercentage) {
+      res.json(similarityPercentage)
+      //res.end(similarityPercentage);
+      console.log("sending json:",similarityPercentage);
+    })
+});
+
 function GetSpotifyAccessToken()
 {
     // requesting access token from refresh token
@@ -93,7 +113,7 @@ var spotify = new Spotify({
 var playlistItems; //request sonucu spotifydan gelecek playlist objesi
 
 //get playlist call
-function GetPlaylist() {
+function GetPlaylistItems() {
 spotify
   .request('https://api.spotify.com/v1/playlists/3uZ0DcmMUUzola8ZC2HxRn/tracks')
   .then(function (data) {
@@ -110,14 +130,14 @@ spotify
 
 // interval
 setTimeout(function(){GetSpotifyAccessToken()}, 1000);
-setTimeout(function(){GetPlaylist()}, 1000);
+setTimeout(function(){GetPlaylistItems()}, 1000);
 setTimeout(function(){PlayWinner()}, 90000);
 setTimeout(function(){RefreshVotableSongs()}, 5000);
 
 setInterval(function () { GetSpotifyAccessToken(); }, 600000);
 setInterval(function () { DetermineMostVotedCurrently(); }, 1000);
 setInterval(function () { GetCurrentlyPlaying(); }, 3000);
-setInterval(function () { GetPlaylist(); }, 10000);
+setInterval(function () { GetPlaylistItems(); }, 10000);
 //setInterval(function () { RefreshVotableSongs(); },20000);
 
 function DetermineMostVotedCurrently() {
@@ -255,9 +275,116 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+//----------------------------------------------
+//playlist comparison functions (/getsimilarity)
+var SpotifyWebApi = require('spotify-web-api-node');
+var spotifyApi = new SpotifyWebApi({
+  clientId: 'bddfdc9233b5493899809dcc42ca5cc3',
+  clientSecret: 'd97a1e581b5f4b4b9da348d6a0529e02',
+  redirectUri: 'http://localhost:5000'
+});
+spotifyApi.setAccessToken(spotifyToken);
+
+
+//get playlist call
+function GetPlaylist(playlistid) {
+  return new Promise(function (resolve, reject) {
+    spotify
+      .request('https://api.spotify.com/v1/playlists/' + playlistid)
+      .then(function (data) {
+        // data'da items diye bi array geliyor onun track objeleri var
+        //console.log(data.items[0].track.album.images[0].url);
+        resolve(data);
+      })
+      .catch(function (err) {
+        console.error('Error occurred: ' + err);
+        reject(err);
+      });
+  })
+}
+
+
+function GetPlaylistFeatures(inputPlaylistItems) {
+  return new Promise(function (resolve, reject) {
+    var playlistLength = Object.keys(inputPlaylistItems).length;
+    var songUris = [];
+    for (let i = 0; i < playlistLength; i++) {
+      songUris.push(inputPlaylistItems[i].track.id);
+    }
+    spotifyApi.getAudioFeaturesForTracks(songUris)
+      .then(function (data) {
+        resolve(data.body.audio_features);
+      })
+      .catch(function (err) {
+        console.error('Error occurred: ' + err);
+        reject(err);
+      })
+  });
+}
+
+function CalculatePlaylistFeaturesMean(playlistFeatures) {
+  var playlistLength = Object.keys(playlistFeatures).length;
+  //console.log(playlistFeatures);
+  //declare default dictionary
+  var playlistFeaturesMean = { 'danceability': 0, 'energy': 0, 'speechiness': 0, 'acousticness': 0, 'instrumentalness': 0, 'liveness': 0, 'valence': 0 };
+  var keys = Object.keys(playlistFeaturesMean);
+  //console.log(playlistFeatures);
+  //getting the average of each feature of the playlist and saving them to playlist1FeaturesMean dict
+  for (let i = 0; i < playlistLength; i++) {
+    //add up each songs features to our dict
+    try {
+      playlistFeaturesMean['danceability'] += playlistFeatures[i].danceability;
+      playlistFeaturesMean['energy'] += playlistFeatures[i].energy;
+      playlistFeaturesMean['speechiness'] += playlistFeatures[i].speechiness;
+      playlistFeaturesMean['acousticness'] += playlistFeatures[i].acousticness;
+      playlistFeaturesMean['instrumentalness'] += playlistFeatures[i].instrumentalness;
+      playlistFeaturesMean['liveness'] += playlistFeatures[i].liveness;
+      playlistFeaturesMean['valence'] += playlistFeatures[i].valence;
+
+    }
+    catch (error) {
+      console.log(error);
+    }
+  }
+  for (let i = 0; i < keys.length; i++) {
+    //divide each value to playlistLength to get the average
+    playlistFeaturesMean[keys[i]] /= playlistLength;
+  }
+  //console.log(playlistFeaturesMean);
+  return playlistFeaturesMean;
+
+}
+
+function AddToPlaylistCollection(playlist) {
+  playlistCollection.push(playlist);
+  playlist.name.then(a => console.log(" +'" + a + "' added to playlist collection"));
+}
+
+function CalculateSimilarityToPlaylist(userPlaylist, hostPlaylist) {
+  return new Promise(function (resolve, reject) {
+    var similarityPercentage;
+    var playlistDifference = { 'danceability': 0, 'energy': 0, 'speechiness': 0, 'acousticness': 0, 'instrumentalness': 0, 'liveness': 0, 'valence': 0 };
+    var sumOfDifferences = 0;
+    var keys = Object.keys(playlistDifference);
+    for (let i = 0; i < keys.length; i++) {
+      var hostValue = hostPlaylist.playlistFeaturesMean.then(function (means) { return means[keys[i]]; });
+      var userValue = userPlaylist.playlistFeaturesMean.then(function (means) { return means[keys[i]]; });
+      Promise.all([hostValue, userValue]).then(function (values) {
+        playlistDifference[keys[i]] = Math.abs(values[0] - values[1]);
+        sumOfDifferences += playlistDifference[keys[i]];
+        //console.log("sumOfDifferences=", sumOfDifferences, "playlistDifference[keys[i]]", playlistDifference[keys[i]], "i=", i);
+      }).then(function () {
+        similarityPercentage = ((7 - sumOfDifferences) * 100) / 7;
+        //console.log("similarityPercentages=", similarityPercentage);
+        resolve(similarityPercentage);
+      }
+      )
+    }
+
+  })
+}
 
 
 // start the server
-//app.listen(port, host);
 app.listen(process.env.PORT || 3000);
 //console.log('Server started! At port ' + port);
