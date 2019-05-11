@@ -97,6 +97,7 @@ function GetSpotifyAccessToken()
       var access_token = body.access_token;
       console.log(access_token);
       spotifyToken = access_token;
+      spotifyApi.setAccessToken(spotifyToken);
     }
   });
 }
@@ -283,7 +284,7 @@ var spotifyApi = new SpotifyWebApi({
   clientSecret: 'd97a1e581b5f4b4b9da348d6a0529e02',
   redirectUri: 'http://localhost:5000'
 });
-spotifyApi.setAccessToken(spotifyToken);
+//spotifyApi.setAccessToken(spotifyToken);
 
 //playlist object containing features
 function Playlist(playlistid, type) {
