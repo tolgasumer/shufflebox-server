@@ -22,8 +22,7 @@ var playlistCollection = []; //for playlist comparison-similarity check
 app.post('/sendvote', function (req, res) {
   var song_id = req.body.songid;
   console.log("Incoming POST: Vote for song ID:" + song_id);
-  if(song_id>0 && song_id<6)
-  {
+  if (song_id > 0 && song_id < 6) {
     votes[song_id - 1]++;
   }
   console.log(votes);
@@ -74,7 +73,7 @@ app.post('/getsimilarity', function (req, res) {
     .then(function (similarityPercentage) {
       res.json(similarityPercentage)
       //res.end(similarityPercentage);
-      console.log("sending json:",similarityPercentage);
+      console.log("sending json:", similarityPercentage);
     })
 });
 
@@ -86,13 +85,12 @@ app.post('/getaudiofeatures', function (req, res) {
   playlist.playlistFeaturesMean
     .then(function (playlistFeaturesMean) {
       res.json(playlistFeaturesMean)
-      console.log("sending json:",playlistFeaturesMean);
+      console.log("sending json:", playlistFeaturesMean);
     })
 });
 
-function GetSpotifyAccessToken()
-{
-    // requesting access token from refresh token
+function GetSpotifyAccessToken() {
+  // requesting access token from refresh token
   var refresh_token = 'AQCbR9xoXdt1F-ERUqPrubHUAfvhdCFnLIKT5XZWEcLdpQhV3YvuI_nBB1wqIbJJAqQjrUuBT1HHKNBLT2KUxul6eCpvPb5mY6PhYW7mXH4KEEi80x1pH2kJXzcE9DdqGIvAHg';
   var authOptions = {
     url: 'https://accounts.spotify.com/api/token',
@@ -104,7 +102,7 @@ function GetSpotifyAccessToken()
     json: true
   };
 
-  request.post(authOptions, function(error, response, body) {
+  request.post(authOptions, function (error, response, body) {
     if (!error && response.statusCode === 200) {
       var access_token = body.access_token;
       console.log(access_token);
@@ -127,25 +125,25 @@ var playlistItems; //request sonucu spotifydan gelecek playlist objesi
 
 //get playlist call
 function GetPlaylistItems() {
-spotify
-  .request('https://api.spotify.com/v1/playlists/3uZ0DcmMUUzola8ZC2HxRn/tracks')
-  .then(function (data) {
-    // data'da items diye bi array geliyor onun track objeleri var
-    //console.log(data);
-    //console.log(data.items[0].track.album.images[0].url);
-    playlistItems = data.items;
-    //console.log(playlistItems);
-  })
-  .catch(function (err) {
-    console.error('Error occurred: ' + err);
-  });
+  spotify
+    .request('https://api.spotify.com/v1/playlists/3uZ0DcmMUUzola8ZC2HxRn/tracks')
+    .then(function (data) {
+      // data'da items diye bi array geliyor onun track objeleri var
+      //console.log(data);
+      //console.log(data.items[0].track.album.images[0].url);
+      playlistItems = data.items;
+      //console.log(playlistItems);
+    })
+    .catch(function (err) {
+      console.error('Error occurred: ' + err);
+    });
 }
 
 // interval
-setTimeout(function(){GetSpotifyAccessToken()}, 1000);
-setTimeout(function(){GetPlaylistItems()}, 1000);
-setTimeout(function(){PlayWinner()}, 90000);
-setTimeout(function(){RefreshVotableSongs()}, 5000);
+setTimeout(function () { GetSpotifyAccessToken() }, 1000);
+setTimeout(function () { GetPlaylistItems() }, 1000);
+setTimeout(function () { PlayWinner() }, 9000);
+setTimeout(function () { RefreshVotableSongs() }, 5000);
 
 setInterval(function () { GetSpotifyAccessToken(); }, 600000);
 setInterval(function () { DetermineMostVotedCurrently(); }, 1000);
@@ -155,35 +153,31 @@ setInterval(function () { GetPlaylistItems(); }, 10000);
 
 function DetermineMostVotedCurrently() {
   //votes arrayi bos degilse (oy geldiyse) currentWinner'i degistir, kazanani birinci siraya koy
-  if(votes[0] + votes[1] + votes[2] + votes[3] + votes[4] > 0)
-  {
+  if (votes[0] + votes[1] + votes[2] + votes[3] + votes[4] > 0) {
     mostVotedCurrently = votes.indexOf(Math.max(...votes));
     currentWinner = votableSongIndexes[mostVotedCurrently];
-  }
-  else
-  {
-    //console.log("DetermineMostVotedCurrently(): Votes array is empty, winner hasn't been changed");
   }
   //return votes.indexOf(Math.max(...votes));
 }
 
 function PlayWinner() {
-	if(votes[0] + votes[1] + votes[2] + votes[3] + votes[4] > 0){
-		PutWinningSongToFirst();
-  setTimeout(function(){PlayTheFirstSongOnPlaylist()}, 2000);
+  if (votes[0] + votes[1] + votes[2] + votes[3] + votes[4] == 0) // no votes
+  {
+    currentWinner = votableSongIndexes[getRandomInt(0, 4)];
+    console.log("votes array is empty, playing random song with ID:" + currentWinner + " from votables");
+  }
+  PutWinningSongToFirst();
+  setTimeout(function () { PlayTheFirstSongOnPlaylist() }, 2000);
 
   durationOfNextSong = playlistItems[currentWinner].track.duration_ms;
   currentWinner = 0; //kazanan basa gelecegi icin
 
-  console.log(durationOfNextSong);
+  console.log("durationOfNextSong:" + durationOfNextSong);
   RefreshVotableSongs();
 
-  setTimeout(function(){PlayWinner()}, durationOfNextSong);
-
-	}
-  
-
+  setTimeout(function () { PlayWinner() }, durationOfNextSong);
 }
+
 
 var nowPlayingName;
 var nowPlayingImageUrl;
@@ -209,17 +203,17 @@ function GetCurrentlyPlaying() {
 
 function PutWinningSongToFirst() {
   axios.put('https://api.spotify.com/v1/playlists/3uZ0DcmMUUzola8ZC2HxRn/tracks',
-  {
-    range_start: currentWinner,
-    insert_before: 0
-  }, 
-  {
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + spotifyToken
-    }
-  })
+    {
+      range_start: currentWinner,
+      insert_before: 0
+    },
+    {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + spotifyToken
+      }
+    })
     .then((response) => {
       //console.log(response)
       //console.log(response.data);
@@ -231,20 +225,20 @@ function PutWinningSongToFirst() {
 
 function PlayTheFirstSongOnPlaylist() {
   axios.put('https://api.spotify.com/v1/me/player/play',
-  {
-    "context_uri": "spotify:user:11100316938:playlist:3uZ0DcmMUUzola8ZC2HxRn",
-    "offset": {
-      "position":0
+    {
+      "context_uri": "spotify:user:11100316938:playlist:3uZ0DcmMUUzola8ZC2HxRn",
+      "offset": {
+        "position": 0
+      },
+      "position_ms": 0
     },
-    "position_ms":0
-  }, 
-  {
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + spotifyToken
-    }
-  })
+    {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + spotifyToken
+      }
+    })
     .then((response) => {
       //console.log(response)
       console.log("Now playing the first song on the playlist");
@@ -254,20 +248,18 @@ function PlayTheFirstSongOnPlaylist() {
     })
 }
 
-function RefreshVotableSongs()
-{
+function RefreshVotableSongs() {
   var playlistLength = Object.keys(playlistItems).length;
-  console.log("playlistLength: "+playlistLength);
+  console.log("playlistLength: " + playlistLength);
 
-  for(var i=0;i<votableSongIndexes.length;i++)
-  {
-  	var randomInt = getRandomInt(0,playlistLength-1);
-  	if(votableSongIndexes.includes(randomInt)) {
-  		i--;
-  	}
-  	else {
-  		votableSongIndexes[i] = randomInt;
-  	}
+  for (var i = 0; i < votableSongIndexes.length; i++) {
+    var randomInt = getRandomInt(0, playlistLength - 1);
+    if (votableSongIndexes.includes(randomInt)) {
+      i--;
+    }
+    else {
+      votableSongIndexes[i] = randomInt;
+    }
     //votableSongIndexes[i] = getRandomInt(0,playlistLength-1);
   }
   votes = [0, 0, 0, 0, 0];
@@ -277,15 +269,15 @@ function RefreshVotableSongs()
   //console.log(playlistItems);
 }
 
-function GetDurationOfSong(indexInPlaylist){
+function GetDurationOfSong(indexInPlaylist) {
   durationOfNextSong = playlistItems[indexInPlaylist].track.duration_ms;
   console.log(durationOfNextSong);
 
 }
 function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 //----------------------------------------------
