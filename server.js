@@ -89,6 +89,48 @@ app.post('/getaudiofeatures', function (req, res) {
     })
 });
 
+app.get('/getplaces', function (req, res) {
+  console.log("/getplaces request");
+  places = [
+    {
+      "name": "Gaspar Brasserie",
+      "playlistname": "Slow Rock",
+      "address": "185 Sutter St, San Francisco, CA 94109",
+      "image": { "url": "https://pl.scdn.co/images/pl/default/dc52fac57803a58256eec3379700c01d9697ccbe" },
+      "id": "296W1tgCGPvAjyCSSdiUsG",
+    },
+    {
+      "name": "Chillin",
+      "playlistname": "Dance Pop",
+      "address": "527 Broome St, New York, NY 10013",
+      "image": { "url": "https://pl.scdn.co/images/pl/default/dfb50eee7fc1f60c432d4b00a94d84e98e480860" },
+      "id": "37i9dQZF1DXcZDD7cfEKhW",
+    },
+    {
+      "name": "Coffee Break",
+      "playlistname": "Jazz Classics",
+      "address": "1900 Warner Ave. Unit A Santa Ana, CA",
+      "image": { "url": "https://pl.scdn.co/images/pl/default/4629f9b09c54f1cc645097b0a3004b77c2e73a6e" },
+      "id": "37i9dQZF1DXbITWG1ZJKYt",
+    },
+    {
+      "name": "Sushibo",
+      "playlistname": "90s Metal",
+      "address": "35 Sipes Key, New York, NY 10012",
+      "image": { "url": "https://pl.scdn.co/images/pl/default/b017cc600110985d2f42f0d6aa9be67ee514dabb" },
+      "id": "37i9dQZF1DX08jcQJXDnEQ",
+    },
+    {
+      "name": "Mastergrill",
+      "playlistname": "Classical Essentials",
+      "address": "550 Upton Rue, San Francisco, CA 94109",
+      "image": { "url": "https://pl.scdn.co/images/pl/default/3f48aae3f3e2b8aaf6c424747b795b9171b05988" },
+      "id": "37i9dQZF1DWWEJlAGA9gs0",
+    }
+  ];
+  res.json(places);
+});
+
 function GetSpotifyAccessToken() {
   // requesting access token from refresh token
   var refresh_token = 'AQCbR9xoXdt1F-ERUqPrubHUAfvhdCFnLIKT5XZWEcLdpQhV3YvuI_nBB1wqIbJJAqQjrUuBT1HHKNBLT2KUxul6eCpvPb5mY6PhYW7mXH4KEEi80x1pH2kJXzcE9DdqGIvAHg';
