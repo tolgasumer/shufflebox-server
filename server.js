@@ -168,7 +168,7 @@ var playlistItems; //request sonucu spotifydan gelecek playlist objesi
 //get playlist call
 function GetPlaylistItems() {
   spotify
-    .request('https://api.spotify.com/v1/playlists/3uZ0DcmMUUzola8ZC2HxRn/tracks')
+    .request('https://api.spotify.com/v1/playlists/7zlrsbOPUdw3MgtQhaRPV0/tracks')
     .then(function (data) {
       // data'da items diye bi array geliyor onun track objeleri var
       //console.log(data);
