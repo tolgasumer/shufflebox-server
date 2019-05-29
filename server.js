@@ -244,7 +244,7 @@ function GetCurrentlyPlaying() {
 }
 
 function PutWinningSongToFirst() {
-  axios.put('https://api.spotify.com/v1/playlists/3uZ0DcmMUUzola8ZC2HxRn/tracks',
+  axios.put('https://api.spotify.com/v1/playlists/7zlrsbOPUdw3MgtQhaRPV0/tracks',
     {
       range_start: currentWinner,
       insert_before: 0
@@ -268,7 +268,7 @@ function PutWinningSongToFirst() {
 function PlayTheFirstSongOnPlaylist() {
   axios.put('https://api.spotify.com/v1/me/player/play',
     {
-      "context_uri": "spotify:user:11100316938:playlist:3uZ0DcmMUUzola8ZC2HxRn",
+      "context_uri": "spotify:user:11100316938:playlist:7zlrsbOPUdw3MgtQhaRPV0",
       "offset": {
         "position": 0
       },
